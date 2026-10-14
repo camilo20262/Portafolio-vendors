@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Portafolio Comercial BI · WPP Media</title>
+<title>Propuesta BBVA · WPP Media</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/vendors.css">
 <style>
 :root{
   --navy:#000050;--blue:#5465FF;--peri:#788BFF;--cyan:#00DBEE;--aqua:#93DFE3;--lime:#B0F467;
@@ -42,6 +43,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .brand{display:flex;align-items:center;gap:20px;color:inherit;text-decoration:none;margin-right:auto;flex-shrink:0}
 .brand svg{height:30px;width:auto;flex-shrink:0;overflow:hidden}
 .brand-label{border-left:1px solid color-mix(in srgb,currentColor 35%,transparent);padding:6px 0 6px 20px;white-space:nowrap;font-family:var(--head);font-size:17px;font-weight:700;line-height:1}
+.client-brand{display:grid;place-items:center;height:30px;padding:5px 9px;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,80,.12);flex-shrink:0}
+.client-brand img{width:auto;height:18px}
 .nav nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
 .nav nav::-webkit-scrollbar{display:none}
 .nav nav a{color:inherit;text-decoration:none;font-size:15px;font-weight:500;padding:10px 16px;border-radius:999px;white-space:nowrap;transition:background .2s}
@@ -141,9 +144,11 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .sthead p{color:#C9CFF5;max-width:58ch;margin-top:12px;font-size:17px}
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:start}
 .col{border-radius:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);overflow:hidden}
-.colhead{padding:24px 20px 20px;color:#000050;background-color:#93DFE3;background-image:linear-gradient(to top right,#93DFE3 0%,#83BFF7 50%,#5465FF 100%);min-height:156px;display:flex;flex-direction:column;justify-content:flex-end}
+.col[hidden]{display:none}
+.colhead{position:relative;padding:24px 20px 20px;color:#000050;background-color:#93DFE3;background-image:linear-gradient(to top right,#93DFE3 0%,#83BFF7 50%,#5465FF 100%);min-height:156px;display:flex;flex-direction:column;justify-content:flex-end}
 .colhead h3{font-size:21px;font-weight:800}
 .colhead p{font-size:14px;margin-top:6px;font-weight:500;color:#1D2563}
+.colombia-logo{position:absolute;top:16px;right:16px;height:28px;max-width:82px;padding:5px 9px;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,80,.12);object-fit:contain}
 .list{padding:14px;display:flex;flex-direction:column;gap:10px}
 details.study{border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-left:4px solid var(--c);transition:background .2s}
 details.study:hover{background:rgba(255,255,255,.13)}
@@ -160,6 +165,8 @@ details.study[open] .tagline{color:#4A5278}
 .thumb{border-radius:12px;overflow:hidden;background:#EEF2FF;margin-bottom:12px;aspect-ratio:16/10}
 .thumb img{width:100%;height:100%;object-fit:cover}
 .thumb.fit img{object-fit:contain;padding:6px}
+.thumb.portrait{aspect-ratio:auto}
+.thumb.portrait img{height:auto;object-fit:contain}
 .body p{font-size:13.5px;margin-top:8px;color:#1D2563}
 .body p b{color:#000050}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -223,7 +230,7 @@ html:has(dialog[open]){overflow:hidden}
 
 /* ===== Responsive ===== */
 @media (max-width:1100px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:860px){.brand-label{display:none}}
+@media (max-width:1000px){.brand-label{display:none}}
 @media (max-width:900px){
   .cover-inner,.split,.why,#quienes .split{grid-template-columns:1fr}
   .pstats{grid-template-columns:1fr;gap:14px}
@@ -251,7 +258,10 @@ html:has(dialog[open]){overflow:hidden}
   html{scroll-padding-top:calc(70px + env(safe-area-inset-top,0px))}
   .wrap{padding-left:20px;padding-right:20px}
   .nav .wrap{gap:10px;min-height:64px}
+  .brand{gap:10px}
   .brand svg{height:21px}
+  .client-brand{height:26px;padding:4px 7px}
+  .client-brand img{height:15px}
   .cover{margin-top:-65px;padding-top:65px}
   .nav nav{gap:2px}
   .nav nav a{padding:8px 10px;font-size:13px}
@@ -334,15 +344,17 @@ body.is-editing .studies{padding-bottom:150px}
 
 <header class="nav is-solid">
   <div class="wrap">
-    <a class="brand" href="#inicio" aria-label="WPP Media Business Intelligence, ir al inicio">
+    <a class="brand" href="#inicio" aria-label="WPP Media Business Intelligence y BBVA, ir al inicio">
       <svg viewBox="18.5 18.5 192.64 30.06" aria-hidden="true"><use href="#wppm" x="0" y="0" width="229.641" height="67.2626"></use></svg>
       <span class="brand-label">Business Intelligence</span>
+      <span class="client-brand"><img src="/assets/colombia/bbva-logo.png" alt="BBVA"></span>
     </a>
     <nav aria-label="Secciones">
       <a class="opt" href="#quienes">Quiénes somos</a>
       <a class="opt-sm" href="#escala">Escala</a>
-      <a href="#panorama">Panorama</a>
+      <a class="opt-sm" href="#panorama">Panorama</a>
       <a class="cta" href="#estudios">Estudios</a>
+      <a href="#vendors">Vendors</a>
     </nav>
   </div>
 </header>
@@ -362,7 +374,7 @@ body.is-editing .studies{padding-bottom:150px}
       <div class="cover-stats">
         <div><b>+20</b><span>años</span></div>
         <div><b>25</b><span>mercados</span></div>
-        <div><b>16</b><span>estudios</span></div>
+        <div><b>3</b><span>estudios</span></div>
       </div>
       <a class="btn-primary" href="#estudios">Explorar los estudios</a>
     </div>
@@ -470,7 +482,7 @@ body.is-editing .studies{padding-bottom:150px}
       <div>
         <p class="kicker">Nuestros estudios</p>
         <h2>Estudios de mercado</h2>
-        <p>Cuatro grupos, cada uno responde una pregunta de negocio. Abre un estudio para ver su resumen o entra al detalle completo.</p>
+        <p>Estos son los estudios que proponemos para BBVA y los que hemos hecho para el mercado colombiano. Abre un estudio para ver su resumen o entra al detalle completo.</p>
       </div>
       <button class="edit-entry" id="edit-entry" type="button" aria-label="Ingresar al editor">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
@@ -481,7 +493,7 @@ body.is-editing .studies{padding-bottom:150px}
     <div class="cols">
 
       <!-- 1. MARCA & CAMPAÑA -->
-      <div class="col" style="--c:#5465FF">
+      <div class="col" data-category="0" style="--c:#5465FF">
         <div class="colhead"><h3>Marca &amp; Campaña</h3><p>¿Qué tan fuerte es mi marca y funcionó mi campaña?</p></div>
         <div class="list">
 
@@ -489,7 +501,7 @@ body.is-editing .studies{padding-bottom:150px}
       </div>
 
       <!-- 2. COMPETENCIA & MERCADO -->
-      <div class="col" style="--c:#00DBEE">
+      <div class="col" data-category="1" style="--c:#00DBEE">
         <div class="colhead"><h3>Competencia &amp; Mercado</h3><p>¿Qué hace la competencia y hacia dónde va el mercado?</p></div>
         <div class="list">
 
@@ -497,7 +509,7 @@ body.is-editing .studies{padding-bottom:150px}
       </div>
 
       <!-- 3. CONSUMIDOR & AUDIENCIAS -->
-      <div class="col" style="--c:#B0F467">
+      <div class="col" data-category="2" style="--c:#B0F467">
         <div class="colhead"><h3>Consumidor &amp; Audiencias</h3><p>¿Quién consume, cómo y qué medios prefiere?</p></div>
         <div class="list">
 
@@ -505,14 +517,38 @@ body.is-editing .studies{padding-bottom:150px}
       </div>
 
       <!-- 4. DIGITAL & SOCIAL -->
-      <div class="col" style="--c:#788BFF">
+      <div class="col" data-category="3" style="--c:#788BFF">
         <div class="colhead"><h3>Digital &amp; Social</h3><p>¿Qué se dice de mí en digital y quién influye?</p></div>
         <div class="list">
 
         </div>
       </div>
 
+      <!-- 5. MERCADO DE COLOMBIA -->
+      <div class="col" id="colombia" style="--c:#00DBEE" hidden>
+        <div class="colhead">
+          <img class="colombia-logo" src="/assets/colombia/bbva-logo.png" alt="BBVA">
+          <h3>Mercado de Colombia</h3>
+          <p>Estudios hechos para el mercado colombiano</p>
+        </div>
+        <div class="list"></div>
+      </div>
+
     </div>
+  </div>
+</section>
+
+<!-- VENDORS -->
+<section class="vendors" id="vendors" aria-labelledby="vendors-title">
+  <div class="wrap">
+    <div class="sthead">
+      <div>
+        <h2 id="vendors-title">Vendors</h2>
+      </div>
+      <button class="edit-entry" id="vendors-edit-entry" type="button" aria-label="Ingresar al editor de vendors">Editar</button>
+    </div>
+    <div class="vendors-grid" id="vendors-list"><p class="vendors-empty" role="status">Cargando vendors…</p></div>
+    <noscript><p>Activa JavaScript para consultar los vendors.</p></noscript>
   </div>
 </section>
 
@@ -557,7 +593,7 @@ body.is-editing .studies{padding-bottom:150px}
 <dialog class="editor-dialog" id="login-dialog" aria-labelledby="login-title">
   <form id="login-form">
     <h3 id="login-title">Acceso de edición</h3>
-    <p class="editor-help">Ingresa la contraseña de administración para editar y publicar estudios.</p>
+    <p class="editor-help">Ingresa la contraseña de administración para editar y publicar estudios y vendors.</p>
     <label class="form-field">Contraseña
       <input id="login-password" type="password" autocomplete="current-password" required maxlength="256">
     </label>
@@ -572,13 +608,13 @@ body.is-editing .studies{padding-bottom:150px}
 <dialog class="editor-dialog" id="study-dialog" aria-labelledby="study-form-title">
   <form id="study-form">
     <h3 id="study-form-title">Editar estudio</h3>
-    <p class="editor-help">Usa “Título: texto” para mostrar el título en negrita dentro de puntos y listas.</p>
+    <p class="editor-help" id="study-form-help">Usa “Título: texto” para mostrar el título en negrita dentro de puntos y listas.</p>
     <input id="study-original-id" type="hidden">
     <div class="form-grid">
       <label class="form-field">ID
         <input id="study-id" required maxlength="80" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="nombre-del-estudio">
       </label>
-      <label class="form-field">Categoría
+      <label class="form-field" id="study-category-field">Categoría
         <select id="study-category" required>
           <option value="0">Marca &amp; Campaña</option>
           <option value="1">Competencia &amp; Mercado</option>
@@ -586,22 +622,28 @@ body.is-editing .studies{padding-bottom:150px}
           <option value="3">Digital &amp; Social</option>
         </select>
       </label>
+      <label class="form-field" id="vendor-category-field" hidden>Categoría (opcional)
+        <input id="vendor-category" maxlength="120">
+      </label>
+      <label class="form-field wide" id="vendor-link-field" hidden>Link (opcional)
+        <input id="vendor-link" type="url" maxlength="2048" placeholder="https://">
+      </label>
       <label class="form-field wide">Nombre
         <input id="study-name" required maxlength="120">
       </label>
-      <label class="form-field wide">Frase
+      <label class="form-field wide"><span id="study-tagline-label">Frase</span>
         <textarea id="study-tagline" required maxlength="300"></textarea>
       </label>
-      <label class="form-field wide">Punto 1
+      <label class="form-field wide" data-study-only>Punto 1
         <textarea id="study-point-1" maxlength="500"></textarea>
       </label>
-      <label class="form-field wide">Punto 2
+      <label class="form-field wide" data-study-only>Punto 2
         <textarea id="study-point-2" maxlength="500"></textarea>
       </label>
-      <label class="form-field">Tiempos (uno por línea)
+      <label class="form-field" data-study-only>Tiempos (uno por línea)
         <textarea id="study-times"></textarea>
       </label>
-      <label class="form-field">Etiquetas (una por línea)
+      <label class="form-field" data-study-only>Etiquetas (una por línea)
         <textarea id="study-tags"></textarea>
       </label>
       <div class="form-section">
@@ -620,12 +662,12 @@ body.is-editing .studies{padding-bottom:150px}
           <label class="form-check"><input id="study-image-remove" type="checkbox"> Quitar imagen</label>
         </div>
       </div>
-      <label class="form-field wide">Introducción del detalle
+      <label class="form-field wide" data-study-only>Introducción del detalle
         <textarea id="study-intro" maxlength="2000"></textarea>
       </label>
-      <div class="form-section"><h4>Secciones del detalle</h4><div id="sections-list"></div><button class="repeat-add" type="button" data-add-row="section">+ Agregar sección</button></div>
-      <div class="form-section"><h4>Cronograma</h4><div id="timeline-list"></div><button class="repeat-add" type="button" data-add-row="timeline">+ Agregar actividad</button></div>
-      <div class="form-section"><h4>Datos destacados</h4><div id="facts-list"></div><button class="repeat-add" type="button" data-add-row="fact">+ Agregar dato</button></div>
+      <div class="form-section" data-study-only><h4>Secciones del detalle</h4><div id="sections-list"></div><button class="repeat-add" type="button" data-add-row="section">+ Agregar sección</button></div>
+      <div class="form-section" data-study-only><h4>Cronograma</h4><div id="timeline-list"></div><button class="repeat-add" type="button" data-add-row="timeline">+ Agregar actividad</button></div>
+      <div class="form-section" data-study-only><h4>Datos destacados</h4><div id="facts-list"></div><button class="repeat-add" type="button" data-add-row="fact">+ Agregar dato</button></div>
     </div>
     <p class="login-error" id="study-form-error" role="alert"></p>
     <div class="dialog-actions">
@@ -690,7 +732,7 @@ body.is-editing .studies{padding-bottom:150px}
         if (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'true'); }
       });
     }, {rootMargin: '-45% 0px -50% 0px'});
-    ['inicio','quienes','escala','panorama','estudios'].forEach(function(id){ var el = document.getElementById(id); if (el) spy.observe(el); });
+    ['inicio','quienes','escala','panorama','estudios','vendors'].forEach(function(id){ var el = document.getElementById(id); if (el) spy.observe(el); });
   }
 
 })();
@@ -727,6 +769,7 @@ body.is-editing .studies{padding-bottom:150px}
 })();
 </script>
 <script src="/assets/js/studies-core.js"></script>
+<script src="/assets/js/vendors-core.js"></script>
 <script src="/assets/js/studies-app.js"></script>
 </body>
 </html>
