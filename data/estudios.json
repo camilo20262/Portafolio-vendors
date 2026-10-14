@@ -1,0 +1,191 @@
+[
+  {
+    "id": "lift",
+    "categoria": 0,
+    "nombre": "Media BI Lift",
+    "frase": "¿Cómo saber realmente si las campañas están construyendo marca o simplemente generando ruido?",
+    "puntos": [
+      "Qué es: mide el impacto real de la campaña comparando una línea base en target sin exposición con una medición posterior con exposición suficiente.",
+      "Incluye: cobertura 360°, medición de lift y preguntas ad hoc (5 preguntas personalizadas)."
+    ],
+    "tiempos": [
+      "Entrega: 45 días"
+    ],
+    "etiquetas": [
+      "Inversión: $3.500 USD"
+    ],
+    "imagen": null,
+    "intro": "",
+    "secciones": [
+      {
+        "titulo": "Cómo funciona",
+        "parrafo": "",
+        "lista": [
+          "Antes del lanzamiento: línea base en el target sin exposición a la campaña.",
+          "Con exposición: segunda medición, luego de garantizar un nivel suficiente de exposición."
+        ],
+        "tipoLista": "steps"
+      },
+      {
+        "titulo": "Incluye",
+        "parrafo": "",
+        "lista": [
+          "Cobertura 360°: evalúa cualquier formato, pieza o ecosistema digital.",
+          "Medición de lift: compara los dos momentos para determinar el impacto real.",
+          "Preguntas ad hoc: encuesta personalizada según el objetivo (5 preguntas)."
+        ],
+        "tipoLista": "ticks"
+      },
+      {
+        "titulo": "Cronograma",
+        "parrafo": "",
+        "lista": [],
+        "tipoLista": "ticks"
+      }
+    ],
+    "cronograma": [
+      {
+        "duracion": "2 días háb.",
+        "actividad": "Diseño y aprobación del cuestionario"
+      },
+      {
+        "duracion": "3 días háb.",
+        "actividad": "Programación del cuestionario"
+      },
+      {
+        "duracion": "15 días háb.",
+        "actividad": "Trabajo de campo, primera medición"
+      },
+      {
+        "duracion": "15 días háb.",
+        "actividad": "Trabajo de campo, segunda medición"
+      },
+      {
+        "duracion": "3 días háb.",
+        "actividad": "Procesamiento de la información"
+      },
+      {
+        "duracion": "5 días háb.",
+        "actividad": "Entrega del informe final"
+      }
+    ],
+    "datos": [
+      {
+        "nombre": "Tiempo de entrega",
+        "valor": "45 días"
+      },
+      {
+        "nombre": "Inversión",
+        "valor": "$13.000.000 COP"
+      }
+    ]
+  },
+  {
+    "id": "preview-starview",
+    "categoria": 0,
+    "nombre": "Preview · Starview",
+    "frase": "Optimiza la inversión evaluando la pieza publicitaria antes (Preview) y después (Starview) de su lanzamiento.",
+    "puntos": [
+      "Objetivo: evalúa el impacto que tendría o tuvo la pieza en recordación, entendimiento y efectividad del mensaje.",
+      "Metodología: encuestas cuantitativas, cara a cara en hogares o programadas online."
+    ],
+    "tiempos": [
+      "Campo 2 semanas"
+    ],
+    "etiquetas": [
+      "Informe 5 días háb."
+    ],
+    "imagen": {
+      "ruta": "/assets/estudios/preview-starview.webp",
+      "alt": "Íconos de diana, bombillo y cerebro",
+      "ajuste": "fit"
+    },
+    "intro": "",
+    "secciones": [
+      {
+        "titulo": "Objetivo",
+        "parrafo": "Evaluar el impacto que tendría (Preview) o tuvo (Starview) la pieza en términos de:",
+        "lista": [
+          "Recordación",
+          "Entendimiento",
+          "Efectividad del mensaje"
+        ],
+        "tipoLista": "ticks"
+      },
+      {
+        "titulo": "Metodología",
+        "parrafo": "Encuestas cuantitativas con cuestionario estructurado, mediante entrevista cara a cara en hogares o programación del cuestionario online.",
+        "lista": [],
+        "tipoLista": "ticks"
+      },
+      {
+        "titulo": "Cronograma",
+        "parrafo": "",
+        "lista": [],
+        "tipoLista": "ticks"
+      }
+    ],
+    "cronograma": [
+      {
+        "duracion": "2 días háb.",
+        "actividad": "Elaboración y coordinación del cuestionario"
+      },
+      {
+        "duracion": "2 semanas",
+        "actividad": "Campo face to face, tabulación y tablas"
+      },
+      {
+        "duracion": "5 días háb.",
+        "actividad": "Elaboración del informe, según la extensión del cuestionario"
+      }
+    ],
+    "datos": []
+  },
+  {
+    "id": "mmm",
+    "categoria": 0,
+    "nombre": "MMM · Marketing Mix Modeling",
+    "frase": "Análisis cuantitativo de datos históricos que determina el impacto directo y la contribución de las actividades de marketing a una variable objetivo clave, generalmente las ventas.",
+    "puntos": [],
+    "tiempos": [],
+    "etiquetas": [],
+    "imagen": {
+      "ruta": "/assets/estudios/mmm-4b814e245090.webp",
+      "alt": "imagen",
+      "ajuste": "fit"
+    },
+    "intro": "Para aislar el impacto de cada variable, analizamos simultáneamente todos los factores internos y externos que influyen en las ventas finales de la marca.",
+    "secciones": [
+      {
+        "titulo": "Marketing Impact & ROI Analysis",
+        "parrafo": "",
+        "lista": [
+          "Retorno de la inversión (ROI) por canal de medios y campaña (cómo se ha capitalizado la inversión en comunicación).",
+          "Efectos «paraguas» y «halo» entre campañas.",
+          "Contribución a las ventas derivada de precios, distribución, canales de medios y activaciones especiales.",
+          "Efecto de la fuerza de ventas.",
+          "Ventas base (sin comunicación).",
+          "Efecto precio.",
+          "Influencia de la comunicación de la competencia.",
+          "Duración, creatividad, semanas de emisión y niveles de impresiones/TRP que optimizan la comunicación en medios."
+        ],
+        "tipoLista": "ticks"
+      },
+      {
+        "titulo": "Esta información le permite:",
+        "parrafo": "",
+        "lista": [
+          "Asignar presupuestos de manera más eficiente entre la cartera de productos",
+          "Ajustar los presupuestos de medios en función de los objetivos de crecimiento",
+          "Detectar oportunidades para redistribuir el presupuesto de marketing y maximizar el impacto en las ventas",
+          "Identificar las campañas más eficaces y extraer conclusiones clave",
+          "Optimizar la distribución de la comunicación a lo largo del año, logrando niveles de presencia efectivos",
+          "Apoyar el desarrollo de la estrategia a largo plazo de la marca"
+        ],
+        "tipoLista": "steps"
+      }
+    ],
+    "cronograma": [],
+    "datos": []
+  }
+]
