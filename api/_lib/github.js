@@ -59,10 +59,10 @@ async function tree(baseTree, entries) {
   return call('/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: entries } });
 }
 
-async function createCommit(treeSha, parentSha) {
+async function createCommit(treeSha, parentSha, message) {
   return call('/git/commits', {
     method: 'POST',
-    body: { message: 'Portafolio: actualiza estudios desde el editor', tree: treeSha, parents: [parentSha] }
+    body: { message: message || 'Portafolio: actualiza estudios desde el editor', tree: treeSha, parents: [parentSha] }
   });
 }
 
