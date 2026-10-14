@@ -13,50 +13,7 @@ var upload = require('../api/upload');
 var sessions = require('../api/_lib/session');
 var validation = require('../api/_lib/validation');
 
-process.env.ADMIN_PASSWORD = 'correct-password';
-process.env.SESSION_SECRET = 'test-secret-with-at-least-thirty-two-characters';
-process.env.GITHUB_TOKEN = 'github-test-token';
-process.env.GITHUB_OWNER = 'owner';
-process.env.GITHUB_REPO = 'repo';
-process.env.GITHUB_BRANCH = 'main';
-
-function readJson(relativePath) {
-  return JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
-}
-
-function response() {
-  return {
-    statusCode: 200,
-    headers: {},
-    setHeader: function (name, value) { this.headers[name.toLowerCase()] = value; },
-    end: function (body) { this.body = body; this.json = body ? JSON.parse(body) : {}; }
-  };
-}
-
-function request(method, body, extraHeaders) {
-  return {
-    method: method,
-    body: body,
-    headers: Object.assign({ origin: 'https://portfolio.example', host: 'portfolio.example' }, extraHeaders || {}),
-    socket: { remoteAddress: '127.0.0.1' }
-  };
-}
-
-async function authenticatedCookie() {
-  var req = request('POST', { password: process.env.ADMIN_PASSWORD }, { 'x-forwarded-for': 'login-' + Math.random() });
-  var res = response();
-  await login(req, res);
-  assert.equal(res.statusCode, 200);
-  return res.headers['set-cookie'].split(';')[0];
-}
-
-function githubResponse(data, status) {
-  return {
-    ok: !status || status < 400,
-    status: status || 200,
-    json: async function () { return data; }
-  };
-}
+var { readJson, response, request, authenticatedCookie, githubResponse } = require('./helpers');
 
 test('estudios.json contiene solo los tres estudios pedidos en Marca & Campaña', function () {
   var studies = readJson('data/estudios.json');
@@ -127,8 +84,8 @@ test('el editor enruta el CRUD de la columna Colombia sin mostrar categoría', f
   assert.match(card, /data-move="1"[^>]+data-scope="colombia"/);
   assert.match(card, /data-delete="habitos-efectivo" data-scope="colombia"/);
   assert.match(app, /data-scope="colombia">\+ Agregar estudio<\/button>/);
-  assert.match(app, /categoryField\.hidden = formScope === 'colombia'/);
-  assert.match(app, /study-category'\)\.required = formScope !== 'colombia'/);
+  assert.match(app, /categoryField\.hidden = formScope !== 'studies'/);
+  assert.match(app, /study-category'\)\.required = formScope === 'studies'/);
   assert.match(app, /if \(formScope !== 'colombia'\) study\.categoria/);
   assert.match(app, /moveScope === 'colombia'\) colombiaState = core\.moveStudy/);
   assert.match(app, /removeScope === 'colombia'\) colombiaState = core\.deleteStudy/);

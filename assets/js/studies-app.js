@@ -2,6 +2,7 @@
   'use strict';
 
   var core = window.StudiesCore;
+  var vendorsCore = window.VendorsCore;
   if (!core) return;
 
   var categoryColumns = Array.prototype.slice.call(document.querySelectorAll('#estudios .col[data-category]'));
@@ -15,16 +16,21 @@
   var statusEl = document.getElementById('editor-status');
   var state = [];
   var colombiaState = [];
+  var vendorsState = [];
+  var dirtyScopes = new Set();
+  var loadedScopes = new Set();
+  var editorTarget = 'estudios';
   var baseSha = '';
   var editing = false;
   var dirty = false;
   var publishing = false;
   var activeDetail = 0;
   var lastFocus = null;
-  var pendingImages = { studies: Object.create(null), colombia: Object.create(null) };
+  var pendingImages = { studies: Object.create(null), colombia: Object.create(null), vendors: Object.create(null) };
   var formImage = null;
   var formScope = 'studies';
   var imageProcessing = false;
+  var imageRequest = 0;
   var slugTouched = false;
 
   function request(url, options) {
@@ -58,7 +64,13 @@
     statusEl.className = 'editor-status ' + (kind || 'clean');
   }
 
-  function setDirty(value) {
+  function collectionFor(scope) {
+    return scope === 'vendors' ? vendorsState : scope === 'colombia' ? colombiaState : state;
+  }
+
+  function setDirty(value, scope) {
+    if (value && scope) dirtyScopes.add(scope);
+    if (!value) dirtyScopes.clear();
     dirty = value;
     if (dirty) setStatus('Cambios sin guardar', 'error');
     else setStatus('Sin cambios pendientes', 'clean');
@@ -84,17 +96,31 @@
     categoryLists.forEach(function (list, category) {
       var items = state.filter(function (study) { return study.categoria === category; });
       list.innerHTML = items.map(function (study) { return core.buildStudy(study, editing); }).join('');
-      if (editing) list.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="' + category + '" data-scope="studies">+ Agregar estudio</button>');
+      if (editing && loadedScopes.has('studies')) list.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="' + category + '" data-scope="studies">+ Agregar estudio</button>');
       categoryColumns[category].hidden = visibleCategories.indexOf(category) === -1;
     });
     colombiaList.innerHTML = colombiaState.map(function (study, index) {
       return core.buildColombiaStudy(study, index, editing);
     }).join('');
-    if (editing) colombiaList.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="" data-scope="colombia">+ Agregar estudio</button>');
+    if (editing && loadedScopes.has('colombia')) colombiaList.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="" data-scope="colombia">+ Agregar estudio</button>');
     var showColombia = core.shouldShowColombia(colombiaState, editing);
     colombiaColumn.hidden = !showColombia;
     var count = document.querySelector('#inicio .cover-stats > div:last-child b');
     if (count) count.textContent = String(state.length);
+    var vendorsList = document.getElementById('vendors-list');
+    vendorsList.innerHTML = loadedScopes.has('vendors') ? vendorsState.map(function (vendor) {
+      return vendorsCore.buildVendor(vendor, editing);
+    }).join('') : '<p class="vendors-empty" role="status">No fue posible cargar los vendors. Recarga la página para intentar de nuevo.</p>';
+    if (loadedScopes.has('vendors') && !vendorsState.length) vendorsList.innerHTML = '<p class="vendors-empty">Aún no hay vendors publicados.</p>';
+    if (editing && loadedScopes.has('vendors')) vendorsList.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="" data-scope="vendors">+ Agregar vendor</button>');
+    if (!loadedScopes.has('studies')) {
+      categoryColumns[0].hidden = false;
+      categoryLists[0].innerHTML = '<p>No fue posible cargar los estudios. Recarga la página para intentar de nuevo.</p>';
+    }
+    if (!loadedScopes.has('colombia')) {
+      colombiaColumn.hidden = false;
+      colombiaList.innerHTML = '<p>No fue posible cargar los estudios de Colombia. Recarga la página para intentar de nuevo.</p>';
+    }
     applyImageOrientations();
   }
 
@@ -159,13 +185,13 @@
 
   function enterEditor(session) {
     editing = true;
-    baseSha = session.sha;
+    if (!dirty) baseSha = session.sha;
     document.body.classList.add('is-editing');
     editorBar.hidden = false;
-    setDirty(false);
+    if (!dirty) setDirty(false);
     render();
-    setHash('#estudios');
-    document.getElementById('estudios').scrollIntoView({ block: 'start' });
+    setHash('#' + editorTarget);
+    document.getElementById(editorTarget).scrollIntoView({ block: 'start' });
   }
 
   function showLogin(message) {
@@ -175,7 +201,13 @@
     setTimeout(function () { document.getElementById('login-password').focus(); }, 50);
   }
 
-  function requestEditor() {
+  function requestEditor(event) {
+    if (publishing) return;
+    if (event && event.currentTarget) editorTarget = event.currentTarget.id === 'vendors-edit-entry' ? 'vendors' : 'estudios';
+    if (editing) {
+      document.getElementById(editorTarget).scrollIntoView({ block: 'start' });
+      return;
+    }
     request('/api/session', { credentials: 'same-origin', cache: 'no-store' })
       .then(enterEditor)
       .catch(function (error) {
@@ -228,6 +260,7 @@
   }
 
   function emptyStudy(category, scope) {
+    if (scope === 'vendors') return { id: '', nombre: '', descripcion: '', categoria: '', link: '', imagen: null };
     var study = {
       id: '', nombre: '', frase: '', puntos: [], tiempos: [], etiquetas: [],
       imagen: null, intro: '', secciones: [], cronograma: [], datos: []
@@ -239,21 +272,33 @@
   function openForm(study, isNew, scope) {
     var item = JSON.parse(JSON.stringify(study));
     formScope = scope || 'studies';
+    studyDialog.dataset.scope = formScope;
     if (formImage) URL.revokeObjectURL(formImage.url);
+    var isVendor = formScope === 'vendors';
     document.getElementById('study-form-title').textContent = (isNew ? 'Agregar estudio' : 'Editar estudio') + (formScope === 'colombia' ? ' de Colombia' : '');
+    if (isVendor) document.getElementById('study-form-title').textContent = isNew ? 'Agregar vendor' : 'Editar vendor';
+    document.getElementById('study-form-help').hidden = isVendor;
+    document.getElementById('study-tagline-label').textContent = isVendor ? 'Descripción corta' : 'Frase';
+    document.getElementById('vendor-category-field').hidden = !isVendor;
+    document.getElementById('vendor-link-field').hidden = !isVendor;
+    document.getElementById('vendor-category').value = isVendor ? item.categoria || '' : '';
+    document.getElementById('vendor-link').value = isVendor ? item.link || '' : '';
+    document.getElementById('vendor-link').disabled = !isVendor;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-study-only]'), function (field) { field.hidden = isVendor; });
     document.getElementById('study-original-id').value = isNew ? '' : item.id;
     document.getElementById('study-id').value = item.id;
+    document.getElementById('study-id').placeholder = isVendor ? 'nombre-del-vendor' : 'nombre-del-estudio';
     var categoryField = document.getElementById('study-category-field');
-    categoryField.hidden = formScope === 'colombia';
-    document.getElementById('study-category').required = formScope !== 'colombia';
-    if (formScope !== 'colombia') document.getElementById('study-category').value = String(item.categoria);
+    categoryField.hidden = formScope !== 'studies';
+    document.getElementById('study-category').required = formScope === 'studies';
+    if (formScope === 'studies') document.getElementById('study-category').value = String(item.categoria);
     document.getElementById('study-name').value = item.nombre;
-    document.getElementById('study-tagline').value = item.frase;
-    document.getElementById('study-point-1').value = item.puntos[0] || '';
-    document.getElementById('study-point-2').value = item.puntos[1] || '';
-    document.getElementById('study-times').value = item.tiempos.join('\n');
-    document.getElementById('study-tags').value = item.etiquetas.join('\n');
-    document.getElementById('study-intro').value = item.intro;
+    document.getElementById('study-tagline').value = isVendor ? item.descripcion : item.frase;
+    document.getElementById('study-point-1').value = (item.puntos || [])[0] || '';
+    document.getElementById('study-point-2').value = (item.puntos || [])[1] || '';
+    document.getElementById('study-times').value = (item.tiempos || []).join('\n');
+    document.getElementById('study-tags').value = (item.etiquetas || []).join('\n');
+    document.getElementById('study-intro').value = item.intro || '';
     document.getElementById('study-image-alt').value = item.imagen ? item.imagen.alt : '';
     document.getElementById('study-image-fit').value = item.imagen ? item.imagen.ajuste : 'fit';
     document.getElementById('study-image-remove').checked = false;
@@ -262,9 +307,9 @@
     document.getElementById('sections-list').replaceChildren();
     document.getElementById('timeline-list').replaceChildren();
     document.getElementById('facts-list').replaceChildren();
-    item.secciones.forEach(makeSectionRow);
-    item.cronograma.forEach(function (row) { makePairRow('timeline-list', 'timeline-row', 'Duración', 'Actividad', { first: row.duracion, second: row.actividad }); });
-    item.datos.forEach(function (row) { makePairRow('facts-list', 'fact-row', 'Nombre', 'Valor', { first: row.nombre, second: row.valor }); });
+    (item.secciones || []).forEach(makeSectionRow);
+    (item.cronograma || []).forEach(function (row) { makePairRow('timeline-list', 'timeline-row', 'Duración', 'Actividad', { first: row.duracion, second: row.actividad }); });
+    (item.datos || []).forEach(function (row) { makePairRow('facts-list', 'fact-row', 'Nombre', 'Valor', { first: row.nombre, second: row.valor }); });
     formImage = null;
     imageProcessing = false;
     document.querySelector('#study-form [type="submit"]').disabled = false;
@@ -323,7 +368,7 @@
 
   function collectFormStudy() {
     var originalId = document.getElementById('study-original-id').value;
-    var currentState = formScope === 'colombia' ? colombiaState : state;
+    var currentState = collectionFor(formScope);
     var existing = currentState.find(function (item) { return item.id === originalId; });
     var removeImage = document.getElementById('study-image-remove').checked;
     var image = existing && existing.imagen ? JSON.parse(JSON.stringify(existing.imagen)) : null;
@@ -337,6 +382,14 @@
       image.alt = document.getElementById('study-image-alt').value.trim();
       image.ajuste = document.getElementById('study-image-fit').value;
     }
+    if (formScope === 'vendors') return {
+      id: document.getElementById('study-id').value.trim(),
+      nombre: document.getElementById('study-name').value.trim(),
+      descripcion: document.getElementById('study-tagline').value.trim(),
+      categoria: document.getElementById('vendor-category').value.trim(),
+      link: document.getElementById('vendor-link').value.trim(),
+      imagen: image
+    };
     var study = {
       id: document.getElementById('study-id').value.trim(),
       nombre: document.getElementById('study-name').value.trim(),
@@ -378,18 +431,19 @@
   }
 
   function publish() {
-    if (publishing || !dirty) return;
+    if (publishing || !dirty || !editing) return;
     publishing = true;
     var button = document.getElementById('editor-publish');
     button.disabled = true;
     button.textContent = 'Guardando…';
     setStatus('Subiendo cambios…', 'clean');
-    var payload = JSON.parse(JSON.stringify(state));
-    var colombiaPayload = JSON.parse(JSON.stringify(colombiaState));
+    var payload = {};
+    var scopes = Array.from(dirtyScopes);
+    scopes.forEach(function (scope) { payload[scope] = JSON.parse(JSON.stringify(collectionFor(scope))); });
     var uploads = [];
     var imageQueue = [];
-    ['studies', 'colombia'].forEach(function (scope) {
-      var collection = scope === 'colombia' ? colombiaPayload : payload;
+    scopes.forEach(function (scope) {
+      var collection = payload[scope];
       Object.keys(pendingImages[scope]).forEach(function (id) {
         if (collection.some(function (study) { return study.id === id && study.imagen; })) imageQueue.push({ id: id, scope: scope });
       });
@@ -397,7 +451,7 @@
     imageQueue.reduce(function (chain, item) {
       return chain.then(function () {
         return uploadImage(item.id, pendingImages[item.scope][item.id], item.scope).then(function (uploaded) {
-          var collection = item.scope === 'colombia' ? colombiaPayload : payload;
+          var collection = payload[item.scope];
           var study = collection.find(function (entry) { return entry.id === item.id; });
           study.imagen.ruta = uploaded.path;
           uploads.push({ id: item.id, scope: item.scope, token: uploaded.token });
@@ -405,21 +459,22 @@
       });
     }, Promise.resolve()).then(function () {
       setStatus('Creando publicación…', 'clean');
-      return request('/api/save', jsonOptions('POST', { studies: payload, colombia: colombiaPayload, uploads: uploads, baseSha: baseSha }));
+      return request('/api/save', jsonOptions('POST', Object.assign({ uploads: uploads, baseSha: baseSha }, payload)));
     }).then(function (result) {
-      ['studies', 'colombia'].forEach(function (scope) {
+      scopes.forEach(function (scope) {
         Object.keys(pendingImages[scope]).forEach(function (id) { URL.revokeObjectURL(pendingImages[scope][id].url); });
       });
-      pendingImages = { studies: Object.create(null), colombia: Object.create(null) };
-      state = payload;
-      colombiaState = colombiaPayload;
+      pendingImages = { studies: Object.create(null), colombia: Object.create(null), vendors: Object.create(null) };
+      if (payload.studies) state = payload.studies;
+      if (payload.colombia) colombiaState = payload.colombia;
+      if (payload.vendors) vendorsState = payload.vendors;
       baseSha = result.sha;
-      dirty = false;
+      setDirty(false);
       render();
       setStatus('Guardado. Los cambios aparecerán en el link en 1 a 2 minutos, cuando Vercel termine de publicar.', 'success');
     }).catch(function (error) {
       if (error.status === 409) setStatus('Alguien publicó cambios mientras editabas. Recarga la página para ver la versión nueva.', 'error');
-      else if (error.status === 401) setStatus('La sesión venció. Vuelve a ingresar para publicar.', 'error');
+      else if (error.status === 401) { editing = false; render(); setStatus('La sesión venció. Vuelve a ingresar para publicar.', 'error'); }
       else setStatus(error.message || 'No se pudieron guardar los cambios.', 'error');
     }).finally(function () {
       publishing = false;
@@ -437,16 +492,18 @@
     }
     var step = event.target.closest('[data-step]');
     if (step && detail.open) { openStudy(activeDetail + Number(step.getAttribute('data-step'))); return; }
+    if (publishing && event.target.closest('[data-add], [data-edit], [data-move], [data-delete]')) return;
     var add = event.target.closest('[data-add]');
     if (add && editing) {
       var addScope = add.getAttribute('data-scope') || 'studies';
+      if (!loadedScopes.has(addScope)) return;
       openForm(emptyStudy(Number(add.getAttribute('data-add')), addScope), true, addScope);
       return;
     }
     var edit = event.target.closest('[data-edit]');
     if (edit && editing) {
       var editScope = edit.getAttribute('data-scope') || 'studies';
-      var editState = editScope === 'colombia' ? colombiaState : state;
+      var editState = collectionFor(editScope);
       var item = editState.find(function (study) { return study.id === edit.getAttribute('data-edit'); });
       if (item) openForm(item, false, editScope);
       return;
@@ -456,20 +513,21 @@
       var moveScope = move.getAttribute('data-scope') || 'studies';
       if (moveScope === 'colombia') colombiaState = core.moveStudy(colombiaState, move.getAttribute('data-id'), Number(move.getAttribute('data-move')));
       else state = core.moveStudy(state, move.getAttribute('data-id'), Number(move.getAttribute('data-move')));
-      setDirty(true); render(); return;
+      setDirty(true, moveScope); render(); return;
     }
     var remove = event.target.closest('[data-delete]');
     if (remove && editing) {
       var removeId = remove.getAttribute('data-delete');
       var removeScope = remove.getAttribute('data-scope') || 'studies';
-      if (window.confirm('¿Eliminar este estudio? El cambio no se publicará hasta guardar.')) {
-        if (removeScope === 'colombia') colombiaState = core.deleteStudy(colombiaState, removeId);
+      if (window.confirm('¿Eliminar este ' + (removeScope === 'vendors' ? 'vendor' : 'estudio') + '? El cambio no se publicará hasta guardar.')) {
+        if (removeScope === 'vendors') vendorsState = core.deleteStudy(vendorsState, removeId);
+        else if (removeScope === 'colombia') colombiaState = core.deleteStudy(colombiaState, removeId);
         else state = core.deleteStudy(state, removeId);
         if (pendingImages[removeScope][removeId]) {
           URL.revokeObjectURL(pendingImages[removeScope][removeId].url);
           delete pendingImages[removeScope][removeId];
         }
-        setDirty(true); render();
+        setDirty(true, removeScope); render();
       }
       return;
     }
@@ -499,9 +557,11 @@
     if (event.key === 'ArrowLeft') openStudy(activeDetail - 1);
   });
 
+  document.getElementById('vendors-edit-entry').addEventListener('click', requestEditor);
   document.getElementById('edit-entry').addEventListener('click', requestEditor);
   document.getElementById('editor-publish').addEventListener('click', publish);
   document.getElementById('editor-logout').addEventListener('click', function () {
+    if (publishing) return;
     if (dirty && !window.confirm('Hay cambios sin guardar. ¿Cerrar sesión de todos modos?')) return;
     request('/api/logout', jsonOptions('POST', {})).finally(function () { location.href = location.pathname + '#estudios'; location.reload(); });
   });
@@ -525,36 +585,54 @@
   document.getElementById('study-image').addEventListener('change', function (event) {
     var file = event.target.files[0];
     if (!file) return;
+    var requestId = ++imageRequest;
     imageProcessing = true;
     document.querySelector('#study-form [type="submit"]').disabled = true;
     document.getElementById('study-form-error').textContent = 'Comprimiendo imagen…';
     imageFromFile(file).then(function (result) {
+      if (requestId !== imageRequest) { URL.revokeObjectURL(result.url); return; }
       if (formImage) URL.revokeObjectURL(formImage.url);
       formImage = result;
       document.getElementById('study-image-remove').checked = false;
       updateImagePreview(result.url, document.getElementById('study-image-alt').value);
       document.getElementById('study-form-error').textContent = '';
-    }).catch(function (error) { document.getElementById('study-form-error').textContent = error.message; })
+    }).catch(function (error) { if (requestId === imageRequest) document.getElementById('study-form-error').textContent = error.message; })
       .finally(function () {
+        if (requestId !== imageRequest) return;
         imageProcessing = false;
         document.querySelector('#study-form [type="submit"]').disabled = false;
       });
   });
   document.getElementById('study-image-remove').addEventListener('change', function (event) {
-    if (event.target.checked) updateImagePreview('', '');
+    if (event.target.checked) {
+      imageRequest += 1;
+      imageProcessing = false;
+      document.querySelector('#study-form [type="submit"]').disabled = false;
+      if (formImage) URL.revokeObjectURL(formImage.url);
+      formImage = null;
+      document.getElementById('study-image').value = '';
+      updateImagePreview('', '');
+    } else {
+      var originalId = document.getElementById('study-original-id').value;
+      var existing = collectionFor(formScope).find(function (item) { return item.id === originalId; });
+      updateImagePreview(existing && existing.imagen && existing.imagen.ruta, document.getElementById('study-image-alt').value);
+    }
   });
 
   document.getElementById('study-form').addEventListener('submit', function (event) {
     event.preventDefault();
     var errorEl = document.getElementById('study-form-error');
     try {
+      if (!editing || publishing || !loadedScopes.has(formScope)) throw new Error('No se puede editar en este momento.');
       if (imageProcessing) throw new Error('Espera a que termine la compresión de la imagen.');
       var originalId = document.getElementById('study-original-id').value;
       var study = collectFormStudy();
-      validateClientStudy(study);
-      var currentState = formScope === 'colombia' ? colombiaState : state;
+      if (formScope === 'vendors') study = vendorsCore.validateVendors([study], true)[0];
+      else validateClientStudy(study);
+      var currentState = collectionFor(formScope);
       currentState = originalId ? core.updateStudy(currentState, originalId, study) : core.createStudy(currentState, study);
-      if (formScope === 'colombia') colombiaState = currentState;
+      if (formScope === 'vendors') vendorsState = currentState;
+      else if (formScope === 'colombia') colombiaState = currentState;
       else state = currentState;
       if (originalId && originalId !== study.id && pendingImages[formScope][originalId]) {
         pendingImages[formScope][study.id] = pendingImages[formScope][originalId];
@@ -570,7 +648,7 @@
         formImage = null;
       }
       studyDialog.close();
-      setDirty(true);
+      setDirty(true, formScope);
       render();
     } catch (error) {
       errorEl.textContent = error.message;
@@ -578,6 +656,7 @@
   });
 
   studyDialog.addEventListener('close', function () {
+    imageRequest += 1;
     if (formImage) {
       URL.revokeObjectURL(formImage.url);
       formImage = null;
@@ -590,16 +669,23 @@
     event.returnValue = '';
   });
 
-  Promise.all([
-    request('/data/estudios.json', { cache: 'no-store' }),
-    request('/data/colombia.json', { cache: 'no-store' })
-  ]).then(function (collections) {
-    state = collections[0];
-    colombiaState = collections[1];
+  // Load independently: an unavailable collection cannot be saved as an empty one.
+  document.getElementById('edit-entry').disabled = true;
+  document.getElementById('vendors-edit-entry').disabled = true;
+  var sources = { studies: '/data/estudios.json', colombia: '/data/colombia.json', vendors: '/data/vendors.json' };
+  Promise.all(Object.keys(sources).map(function (scope) {
+    return request(sources[scope], { cache: 'no-store' }).then(function (items) {
+      if (!Array.isArray(items)) throw new Error('Colección inválida.');
+      if (scope === 'vendors') vendorsState = vendorsCore.validateVendors(items);
+      else if (scope === 'colombia') colombiaState = items;
+      else state = items;
+      loadedScopes.add(scope);
+    }).catch(function () { /* render() shows an error for this collection only. */ });
+  })).then(function () {
     render();
+    document.getElementById('edit-entry').disabled = !loadedScopes.size;
+    document.getElementById('vendors-edit-entry').disabled = !loadedScopes.size;
     openHashStudy();
     if (location.hash === '#editar') requestEditor();
-  }).catch(function () {
-    categoryLists[0].innerHTML = '<p>No fue posible cargar los estudios. Recarga la página para intentar de nuevo.</p>';
   });
 })();

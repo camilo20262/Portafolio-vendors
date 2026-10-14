@@ -95,11 +95,11 @@
     return html + '</template>';
   }
 
-  function buildAdmin(study, scope) {
+  function buildAdmin(study, scope, reorder) {
     return '<div class="study-admin" aria-label="Acciones de edición">' +
       '<button type="button" data-edit="' + esc(study.id) + '" data-scope="' + scope + '">Editar</button>' +
-      '<button type="button" data-move="-1" data-id="' + esc(study.id) + '" data-scope="' + scope + '" aria-label="Mover hacia arriba">↑</button>' +
-      '<button type="button" data-move="1" data-id="' + esc(study.id) + '" data-scope="' + scope + '" aria-label="Mover hacia abajo">↓</button>' +
+      (reorder === false ? '' : '<button type="button" data-move="-1" data-id="' + esc(study.id) + '" data-scope="' + scope + '" aria-label="Mover hacia arriba">↑</button>' +
+      '<button type="button" data-move="1" data-id="' + esc(study.id) + '" data-scope="' + scope + '" aria-label="Mover hacia abajo">↓</button>') +
       '<button type="button" class="danger" data-delete="' + esc(study.id) + '" data-scope="' + scope + '">Eliminar</button>' +
       '</div>';
   }
@@ -204,6 +204,7 @@
 
   return {
     esc: esc,
+    buildAdmin: buildAdmin,
     richText: richText,
     hasDetail: hasDetail,
     buildStudy: buildStudy,

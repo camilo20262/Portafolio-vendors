@@ -3,7 +3,7 @@
 var http = require('./_lib/http');
 var sessions = require('./_lib/session');
 var github = require('./_lib/github');
-var validation = require('./_lib/validation');
+var collections = require('./_lib/collections');
 
 function imagePaths(collections) {
   var paths = new Set();
@@ -20,7 +20,7 @@ function uploadKey(scope, id) {
 }
 
 function validClaimPath(scope, path) {
-  var directory = scope === 'colombia' ? 'colombia' : 'estudios';
+  var directory = collections[scope].directory;
   return new RegExp('^/assets/' + directory + '/[a-z0-9-]+\\.(webp|png|jpe?g)$').test(path || '');
 }
 
@@ -40,17 +40,22 @@ module.exports = async function save(req, res) {
       throw Object.assign(new Error('El SHA base no es válido.'), { status: 400 });
     }
 
-    var studies = validation.validateStudies(body.studies);
-    var colombia = validation.validateColombia(body.colombia);
-    var uploads = Array.isArray(body.uploads) ? body.uploads : [];
-    if (uploads.length > studies.length + colombia.length) {
-      throw Object.assign(new Error('Hay demasiadas imágenes nuevas.'), { status: 400 });
+    // Omitted scopes are never read, rewritten or included in image cleanup.
+    var scopes = Object.keys(collections).filter(function (scope) {
+      return Object.prototype.hasOwnProperty.call(body, scope);
+    });
+    if (!scopes.length) throw Object.assign(new Error('No hay colecciones para guardar.'), { status: 400 });
+    var next = Object.create(null);
+    scopes.forEach(function (scope) { next[scope] = collections[scope].validate(body[scope]); });
+    var uploads = body.uploads === undefined ? [] : body.uploads;
+    if (!Array.isArray(uploads) || uploads.length > scopes.reduce(function (sum, scope) { return sum + next[scope].length; }, 0)) {
+      throw Object.assign(new Error('Las imágenes nuevas no son válidas.'), { status: 400 });
     }
 
     var uploadClaims = new Map();
     uploads.forEach(function (upload) {
       if (!upload || typeof upload.id !== 'string' || typeof upload.scope !== 'string' || typeof upload.token !== 'string' ||
-          (upload.scope !== 'studies' && upload.scope !== 'colombia')) {
+          scopes.indexOf(upload.scope) === -1) {
         throw Object.assign(new Error('Una referencia de imagen no es válida.'), { status: 400 });
       }
       var claim = sessions.readUploadToken(upload.token);
@@ -65,9 +70,9 @@ module.exports = async function save(req, res) {
 
     uploadClaims.forEach(function (claim, key) {
       var scope = key.split(':')[0];
-      var collection = scope === 'colombia' ? colombia : studies;
+      var collection = next[scope];
       var study = collection.find(function (item) { return item.id === claim.id; });
-      if (!study || !study.imagen) throw Object.assign(new Error('La imagen nueva no corresponde a un estudio.'), { status: 400 });
+      if (!study || !study.imagen) throw Object.assign(new Error('La imagen nueva no corresponde a un elemento de la colección.'), { status: 400 });
       study.imagen.ruta = claim.path;
     });
 
@@ -76,41 +81,40 @@ module.exports = async function save(req, res) {
       return http.send(res, 409, { error: 'Alguien publicó cambios mientras editabas. Recarga la página para ver la versión nueva.' });
     }
 
-    var results = await Promise.all([
-      github.commit(currentSha),
-      github.file('data/estudios.json', currentSha),
-      github.file('data/colombia.json', currentSha)
-    ]);
+    var results = await Promise.all([github.commit(currentSha)].concat(scopes.map(function (scope) {
+      return github.file(collections[scope].path, currentSha);
+    })));
     var currentCommit = results[0];
-    var oldStudies = parseJson(results[1], 'estudios');
-    var oldColombia = parseJson(results[2], 'estudios de Colombia');
-
-    var blobs = await Promise.all([
-      github.blob(Buffer.from(JSON.stringify(studies, null, 2) + '\n', 'utf8')),
-      github.blob(Buffer.from(JSON.stringify(colombia, null, 2) + '\n', 'utf8'))
-    ]);
-    var entries = [
-      { path: 'data/estudios.json', mode: '100644', type: 'blob', sha: blobs[0] },
-      { path: 'data/colombia.json', mode: '100644', type: 'blob', sha: blobs[1] }
-    ];
+    var entries = [];
+    // Validate old paths too: cleanup must stay inside each collection's directory.
+    scopes.forEach(function (scope, index) {
+      var previous = collections[scope].validate(parseJson(results[index + 1], scope));
+      var oldPaths = imagePaths([previous]);
+      var newPaths = imagePaths([next[scope]]);
+      var claimedPaths = new Set(Array.from(uploadClaims.values()).filter(function (claim) {
+        return claim.scope === scope;
+      }).map(function (claim) { return claim.path; }));
+      newPaths.forEach(function (path) {
+        if (!oldPaths.has(path) && !claimedPaths.has(path)) {
+          throw Object.assign(new Error('Una imagen nueva no fue generada por el servidor.'), { status: 400 });
+        }
+      });
+      oldPaths.forEach(function (path) {
+        if (!newPaths.has(path)) entries.push({ path: path.replace(/^\//, ''), mode: '100644', type: 'blob', sha: null });
+      });
+    });
+    var blobs = await Promise.all(scopes.map(function (scope) {
+      return github.blob(Buffer.from(JSON.stringify(next[scope], null, 2) + '\n', 'utf8'));
+    }));
+    entries = scopes.map(function (scope, index) {
+      return { path: collections[scope].path, mode: '100644', type: 'blob', sha: blobs[index] };
+    }).concat(entries);
     uploadClaims.forEach(function (claim) {
       entries.push({ path: claim.path.replace(/^\//, ''), mode: '100644', type: 'blob', sha: claim.sha });
     });
 
-    var oldPaths = imagePaths([oldStudies, oldColombia]);
-    var newPaths = imagePaths([studies, colombia]);
-    var claimedPaths = new Set(Array.from(uploadClaims.values()).map(function (claim) { return claim.path; }));
-    newPaths.forEach(function (path) {
-      if (!oldPaths.has(path) && !claimedPaths.has(path)) {
-        throw Object.assign(new Error('Una imagen nueva no fue generada por el servidor.'), { status: 400 });
-      }
-    });
-    oldPaths.forEach(function (path) {
-      if (!newPaths.has(path)) entries.push({ path: path.replace(/^\//, ''), mode: '100644', type: 'blob', sha: null });
-    });
-
     var newTree = await github.tree(currentCommit.tree.sha, entries);
-    var newCommit = await github.createCommit(newTree.sha, currentSha);
+    var newCommit = await github.createCommit(newTree.sha, currentSha, 'Portafolio: actualiza ' + scopes.join(', ') + ' desde el editor');
     try { await github.updateRef(newCommit.sha); }
     catch (error) {
       if (error.status === 409 || error.status === 422) {

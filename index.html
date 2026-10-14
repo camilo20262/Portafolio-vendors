@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/vendors.css">
 <style>
 :root{
   --navy:#000050;--blue:#5465FF;--peri:#788BFF;--cyan:#00DBEE;--aqua:#93DFE3;--lime:#B0F467;
@@ -353,6 +354,7 @@ body.is-editing .studies{padding-bottom:150px}
       <a class="opt-sm" href="#escala">Escala</a>
       <a class="opt-sm" href="#panorama">Panorama</a>
       <a class="cta" href="#estudios">Estudios</a>
+      <a href="#vendors">Vendors</a>
     </nav>
   </div>
 </header>
@@ -536,6 +538,20 @@ body.is-editing .studies{padding-bottom:150px}
   </div>
 </section>
 
+<!-- VENDORS -->
+<section class="vendors" id="vendors" aria-labelledby="vendors-title">
+  <div class="wrap">
+    <div class="sthead">
+      <div>
+        <h2 id="vendors-title">Vendors</h2>
+      </div>
+      <button class="edit-entry" id="vendors-edit-entry" type="button" aria-label="Ingresar al editor de vendors">Editar</button>
+    </div>
+    <div class="vendors-grid" id="vendors-list"><p class="vendors-empty" role="status">Cargando vendors…</p></div>
+    <noscript><p>Activa JavaScript para consultar los vendors.</p></noscript>
+  </div>
+</section>
+
 </main>
 
 <footer class="end">
@@ -577,7 +593,7 @@ body.is-editing .studies{padding-bottom:150px}
 <dialog class="editor-dialog" id="login-dialog" aria-labelledby="login-title">
   <form id="login-form">
     <h3 id="login-title">Acceso de edición</h3>
-    <p class="editor-help">Ingresa la contraseña de administración para editar y publicar estudios.</p>
+    <p class="editor-help">Ingresa la contraseña de administración para editar y publicar estudios y vendors.</p>
     <label class="form-field">Contraseña
       <input id="login-password" type="password" autocomplete="current-password" required maxlength="256">
     </label>
@@ -592,7 +608,7 @@ body.is-editing .studies{padding-bottom:150px}
 <dialog class="editor-dialog" id="study-dialog" aria-labelledby="study-form-title">
   <form id="study-form">
     <h3 id="study-form-title">Editar estudio</h3>
-    <p class="editor-help">Usa “Título: texto” para mostrar el título en negrita dentro de puntos y listas.</p>
+    <p class="editor-help" id="study-form-help">Usa “Título: texto” para mostrar el título en negrita dentro de puntos y listas.</p>
     <input id="study-original-id" type="hidden">
     <div class="form-grid">
       <label class="form-field">ID
@@ -606,22 +622,28 @@ body.is-editing .studies{padding-bottom:150px}
           <option value="3">Digital &amp; Social</option>
         </select>
       </label>
+      <label class="form-field" id="vendor-category-field" hidden>Categoría (opcional)
+        <input id="vendor-category" maxlength="120">
+      </label>
+      <label class="form-field wide" id="vendor-link-field" hidden>Link (opcional)
+        <input id="vendor-link" type="url" maxlength="2048" placeholder="https://">
+      </label>
       <label class="form-field wide">Nombre
         <input id="study-name" required maxlength="120">
       </label>
-      <label class="form-field wide">Frase
+      <label class="form-field wide"><span id="study-tagline-label">Frase</span>
         <textarea id="study-tagline" required maxlength="300"></textarea>
       </label>
-      <label class="form-field wide">Punto 1
+      <label class="form-field wide" data-study-only>Punto 1
         <textarea id="study-point-1" maxlength="500"></textarea>
       </label>
-      <label class="form-field wide">Punto 2
+      <label class="form-field wide" data-study-only>Punto 2
         <textarea id="study-point-2" maxlength="500"></textarea>
       </label>
-      <label class="form-field">Tiempos (uno por línea)
+      <label class="form-field" data-study-only>Tiempos (uno por línea)
         <textarea id="study-times"></textarea>
       </label>
-      <label class="form-field">Etiquetas (una por línea)
+      <label class="form-field" data-study-only>Etiquetas (una por línea)
         <textarea id="study-tags"></textarea>
       </label>
       <div class="form-section">
@@ -640,12 +662,12 @@ body.is-editing .studies{padding-bottom:150px}
           <label class="form-check"><input id="study-image-remove" type="checkbox"> Quitar imagen</label>
         </div>
       </div>
-      <label class="form-field wide">Introducción del detalle
+      <label class="form-field wide" data-study-only>Introducción del detalle
         <textarea id="study-intro" maxlength="2000"></textarea>
       </label>
-      <div class="form-section"><h4>Secciones del detalle</h4><div id="sections-list"></div><button class="repeat-add" type="button" data-add-row="section">+ Agregar sección</button></div>
-      <div class="form-section"><h4>Cronograma</h4><div id="timeline-list"></div><button class="repeat-add" type="button" data-add-row="timeline">+ Agregar actividad</button></div>
-      <div class="form-section"><h4>Datos destacados</h4><div id="facts-list"></div><button class="repeat-add" type="button" data-add-row="fact">+ Agregar dato</button></div>
+      <div class="form-section" data-study-only><h4>Secciones del detalle</h4><div id="sections-list"></div><button class="repeat-add" type="button" data-add-row="section">+ Agregar sección</button></div>
+      <div class="form-section" data-study-only><h4>Cronograma</h4><div id="timeline-list"></div><button class="repeat-add" type="button" data-add-row="timeline">+ Agregar actividad</button></div>
+      <div class="form-section" data-study-only><h4>Datos destacados</h4><div id="facts-list"></div><button class="repeat-add" type="button" data-add-row="fact">+ Agregar dato</button></div>
     </div>
     <p class="login-error" id="study-form-error" role="alert"></p>
     <div class="dialog-actions">
@@ -710,7 +732,7 @@ body.is-editing .studies{padding-bottom:150px}
         if (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'true'); }
       });
     }, {rootMargin: '-45% 0px -50% 0px'});
-    ['inicio','quienes','escala','panorama','estudios'].forEach(function(id){ var el = document.getElementById(id); if (el) spy.observe(el); });
+    ['inicio','quienes','escala','panorama','estudios','vendors'].forEach(function(id){ var el = document.getElementById(id); if (el) spy.observe(el); });
   }
 
 })();
@@ -747,6 +769,7 @@ body.is-editing .studies{padding-bottom:150px}
 })();
 </script>
 <script src="/assets/js/studies-core.js"></script>
+<script src="/assets/js/vendors-core.js"></script>
 <script src="/assets/js/studies-app.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ var http = require('./_lib/http');
 var sessions = require('./_lib/session');
 var github = require('./_lib/github');
 var validation = require('./_lib/validation');
+var collections = require('./_lib/collections');
 
 module.exports = async function upload(req, res) {
   try {
@@ -16,13 +17,13 @@ module.exports = async function upload(req, res) {
       throw Object.assign(new Error('El ID del estudio no es válido.'), { status: 400 });
     }
     var scope = String(req.headers['x-study-scope'] || 'studies');
-    if (scope !== 'studies' && scope !== 'colombia') {
+    if (!Object.prototype.hasOwnProperty.call(collections, scope)) {
       throw Object.assign(new Error('La colección del estudio no es válida.'), { status: 400 });
     }
     var bytes = await http.rawBody(req, validation.MAX_IMAGE + 1);
     var type = validation.validateImageBytes(bytes);
     var hash = crypto.createHash('sha256').update(bytes).digest('hex').slice(0, 12);
-    var directory = scope === 'colombia' ? 'colombia' : 'estudios';
+    var directory = collections[scope].directory;
     var path = '/assets/' + directory + '/' + id + '-' + hash + '.' + type.ext;
     var sha = await github.blob(bytes);
     var token = sessions.uploadToken({ id: id, scope: scope, path: path, sha: sha });
