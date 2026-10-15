@@ -6,14 +6,14 @@ Página estática con un editor autenticado para crear, modificar, ordenar y eli
 
 - `index.html`: página pública, diálogos y controles del editor.
 - `data/estudios.json`: fuente ordenada del portafolio general.
-- `data/colombia.json`: estudios diseñados para el mercado colombiano.
+- `data/colombia.json`: archivo histórico de la sección retirada de Colombia; la página y el editor ya no lo cargan.
 - `data/vendors.json`: lista independiente de vendors (inicialmente vacía).
 - `assets/js/studies-core.js`: render seguro y operaciones CRUD.
 - `assets/js/studies-app.js`: detalle público, sesión e interfaz de edición.
 - `assets/js/vendors-core.js`: parseo, validación compartida entre navegador/servidor y construcción segura de tarjetas de vendors.
 - `assets/css/vendors.css`: estilos de Vendors con las variables de color y tipografía existentes.
-- `api/_lib/collections.js`: rutas y validadores de las tres colecciones.
-- `assets/estudios/` y `assets/colombia/`: imágenes de cada colección.
+- `api/_lib/collections.js`: rutas y validadores, con compatibilidad para los datos históricos de Colombia.
+- `assets/estudios/`: imágenes del portafolio; `assets/colombia/` conserva las imágenes de los estudios históricos.
 - `assets/vendors/`: imágenes de vendors; se crea al publicar la primera imagen.
 - `assets/img/` y `assets/video/`: medios generales de la página.
 - `api/`: login, logout, sesión, carga de imágenes y publicación.

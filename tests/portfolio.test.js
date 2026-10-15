@@ -15,50 +15,22 @@ var validation = require('../api/_lib/validation');
 
 var { readJson, response, request, authenticatedCookie, githubResponse } = require('./helpers');
 
-test('estudios.json contiene solo los tres estudios pedidos en Marca & Campaña', function () {
+test('el catálogo actual cumple el esquema y sus imágenes existen', function () {
   var studies = readJson('data/estudios.json');
-  assert.deepEqual(studies.map(function (study) { return study.id; }), ['lift', 'preview-starview', 'mmm']);
-  assert.deepEqual(studies.map(function (study) { return study.categoria; }), [0, 0, 0]);
-  assert.equal(studies[0].nombre, 'Media BI Lift');
-  assert.equal(studies[1].nombre, 'Preview · Starview');
-  assert.equal(studies[2].nombre, 'MMM · Marketing Mix Modeling');
-  assert.equal(studies[2].secciones.length, 2);
-  assert.match(studies[2].intro, /aislar el impacto de cada variable/);
-  assert.match(core.buildStudy(studies[2], false), /data-open/);
+  assert.ok(studies.length > 0);
+  assert.deepEqual(validation.validateStudies(studies), studies);
+  studies.forEach(function (study) {
+    if (study.imagen) assert.ok(fs.existsSync(path.join(root, study.imagen.ruta)), study.imagen.ruta);
+  });
 });
 
 test('las categorías vacías se ocultan en público y aparecen en edición', function () {
-  var studies = readJson('data/estudios.json');
+  var studies = [{ categoria: 0 }, { categoria: 0 }];
   assert.deepEqual(core.visibleCategoryIndexes(studies, false), [0]);
   assert.deepEqual(core.visibleCategoryIndexes(studies, true), [0, 1, 2, 3]);
 });
 
-test('la columna de Colombia renderiza sus dos estudios como details.study', function () {
-  var colombia = readJson('data/colombia.json');
-  assert.equal(colombia.length, 2);
-  assert.equal(Object.prototype.hasOwnProperty.call(colombia[0], 'categoria'), false);
-  var html = colombia.map(function (study, index) { return core.buildColombiaStudy(study, index, false); }).join('');
-  assert.equal((html.match(/<details class="study"/g) || []).length, 2);
-  assert.equal((html.match(/<summary>/g) || []).length, 2);
-  assert.equal((html.match(/<template class="detail">/g) || []).length, 2);
-  assert.match(html, /Hábitos de uso del efectivo en Colombia/);
-  assert.match(html, /Hábitos y usos del dinero en Colombia/);
-  assert.equal((html.match(/<figure class="thumb/g) || []).length, 2);
-  assert.equal(colombia[1].imagen.ruta, '/assets/colombia/habitos-usos-dinero.webp');
-  assert.match(colombia[1].imagen.alt, /visualización de datos financieros/);
-  assert.match(html, /<div class="tags">/);
-  assert.equal((html.match(/data-detail-label="Mercado de Colombia"/g) || []).length, 2);
-  assert.equal((html.match(/data-open/g) || []).length, 2);
-  assert.doesNotMatch(html, /colombia-card/);
-});
-
-test('la sección de Colombia no se muestra vacía salvo durante la edición', function () {
-  assert.equal(core.shouldShowColombia([], false), false);
-  assert.equal(core.shouldShowColombia([], true), true);
-  assert.equal(core.shouldShowColombia([{}], false), true);
-});
-
-test('crear, editar, reordenar y eliminar estudios de Colombia conserva un arreglo sin categoría', function () {
+test('el CRUD compartido admite colecciones sin categoría', function () {
   var initial = [
     { id: 'a', nombre: 'A' },
     { id: 'b', nombre: 'B' }
@@ -74,41 +46,15 @@ test('crear, editar, reordenar y eliminar estudios de Colombia conserva un arreg
   assert.equal(removed.some(function (item) { return 'categoria' in item; }), false);
 });
 
-test('el editor enruta el CRUD de la columna Colombia sin mostrar categoría', function () {
-  var colombia = readJson('data/colombia.json');
-  var card = core.buildColombiaStudy(colombia[0], 0, true);
-  var app = fs.readFileSync(path.join(root, 'assets/js/studies-app.js'), 'utf8');
-
-  assert.match(card, /data-edit="habitos-efectivo" data-scope="colombia"/);
-  assert.match(card, /data-move="-1"[^>]+data-scope="colombia"/);
-  assert.match(card, /data-move="1"[^>]+data-scope="colombia"/);
-  assert.match(card, /data-delete="habitos-efectivo" data-scope="colombia"/);
-  assert.match(app, /data-scope="colombia">\+ Agregar estudio<\/button>/);
-  assert.match(app, /categoryField\.hidden = formScope !== 'studies'/);
-  assert.match(app, /study-category'\)\.required = formScope === 'studies'/);
-  assert.match(app, /if \(formScope !== 'colombia'\) study\.categoria/);
-  assert.match(app, /moveScope === 'colombia'\) colombiaState = core\.moveStudy/);
-  assert.match(app, /removeScope === 'colombia'\) colombiaState = core\.deleteStudy/);
-});
-
-test('Colombia está dentro de .cols, sin enlace propio en el menú ni sección aparte', function () {
+test('el portafolio no muestra BBVA ni carga la sección retirada de Colombia', function () {
   var html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  assert.match(html, /<title>Propuesta BBVA · WPP Media<\/title>/);
-  assert.match(html, /aria-label="WPP Media Business Intelligence y BBVA, ir al inicio"/);
-  assert.match(html, /Estos son los estudios que proponemos para BBVA y los que hemos hecho para el mercado colombiano\. Abre un estudio para ver su resumen o entra al detalle completo\./);
-  assert.doesNotMatch(html, /href="#colombia">Colombia<\/a>/);
-  assert.match(html, /class="client-brand"><img[^>]+bbva-logo\.png" alt="BBVA">/);
-  assert.match(html, /<div class="col" id="colombia" style="--c:#00DBEE" hidden>/);
-  assert.match(html, /Estudios hechos para el mercado colombiano/);
-  assert.match(html, /class="colombia-logo"[^>]+bbva-logo\.png/);
-  assert.doesNotMatch(html, /<section[^>]+id="colombia"/);
-  assert.doesNotMatch(html, /colombia-(?:card|grid|brand|image|add)/);
-
-  var columnsStart = html.indexOf('<div class="cols">');
-  var columnsEnd = html.indexOf('</div>\n  </section>', columnsStart);
-  var columns = html.slice(columnsStart, columnsEnd);
-  assert.ok(columns.indexOf('data-category="0"') < columns.indexOf('id="colombia"'));
-  assert.match(columns, /id="colombia"/);
+  var app = fs.readFileSync(path.join(root, 'assets/js/studies-app.js'), 'utf8');
+  assert.match(html, /<title>Portafolio Comercial BI · WPP Media<\/title>/);
+  assert.match(html, /aria-label="WPP Media Business Intelligence, ir al inicio"/);
+  assert.doesNotMatch(html, /BBVA|bbva|client-brand|colombia-logo|id="colombia"|Mercado de Colombia/);
+  assert.doesNotMatch(app, /colombia|Colombia/);
+  assert.match(html, /id="estudios"/);
+  assert.match(html, /id="vendors"/);
 });
 
 test('la cuadrícula conserva cuatro columnas y las vacías no recentran las visibles', function () {
@@ -131,21 +77,20 @@ test('las fotografías verticales conservan su proporción en las tarjetas', fun
   assert.match(app, /applyImageOrientations\(\)/);
 });
 
-test('el orden del detalle incluye los estudios de Colombia después de los estudios generales', function () {
-  var studies = readJson('data/estudios.json');
-  var colombia = readJson('data/colombia.json');
-  var html = studies.map(function (study) { return core.buildStudy(study, false); }).join('') +
-    colombia.map(function (study, index) { return core.buildColombiaStudy(study, index, false); }).join('');
+test('el detalle conserva el orden y excluye tarjetas sin contenido ampliado', function () {
+  var studies = [
+    { id: 'primero', nombre: 'Primero', categoria: 0, intro: 'Detalle del primero' },
+    { id: 'sin-detalle', nombre: 'Sin detalle', categoria: 1 },
+    { id: 'ultimo', nombre: 'Último', categoria: 3, intro: 'Detalle del último' }
+  ];
+  var html = studies.map(function (study) { return core.buildStudy(study, false); }).join('');
   var detailedIds = [];
   var matcher = /<details class="study"[^>]+id="([^"]+)"[^>]+data-has-detail="true"/g;
   var match;
   while ((match = matcher.exec(html))) detailedIds.push(match[1]);
   assert.deepEqual(detailedIds, [
-    'estudio-lift',
-    'estudio-preview-starview',
-    'estudio-mmm',
-    'colombia-estudio-habitos-efectivo',
-    'colombia-estudio-habitos-usos-dinero'
+    'estudio-primero',
+    'estudio-ultimo'
   ]);
 
   var app = fs.readFileSync(path.join(root, 'assets/js/studies-app.js'), 'utf8');
@@ -156,7 +101,7 @@ test('el orden del detalle incluye los estudios de Colombia después de los estu
 test('el contador de portada usa solo estudios.json', function () {
   var app = fs.readFileSync(path.join(root, 'assets/js/studies-app.js'), 'utf8');
   assert.match(app, /count\.textContent = String\(state\.length\)/);
-  assert.doesNotMatch(app, /count\.textContent = String\(state\.length \+ colombiaState\.length\)/);
+  assert.doesNotMatch(app, /count\.textContent = String\(state\.length \+ vendorsState\.length\)/);
 });
 
 test('la validación acepta colombia.json y rechaza categoría o rutas de otra colección', function () {

@@ -122,33 +122,11 @@
     return html;
   }
 
-  function buildColombiaStudy(study, index, editing) {
-    var detailed = hasDetail(study);
-    var html = '<details class="study" name="colombia" id="colombia-estudio-' + esc(study.id) + '" data-detail-study data-detail-label="Mercado de Colombia" data-has-detail="' + detailed + '">';
-    html += '<summary><h4>' + esc(study.nombre) + '</h4><p class="tagline">' + esc(study.frase) + '</p></summary>';
-    html += '<div class="body">';
-    if (study.imagen) {
-      html += '<figure class="thumb' + (study.imagen.ajuste === 'fit' ? ' fit' : '') + '"><img src="' + esc(study.imagen.ruta) + '" alt="' + esc(study.imagen.alt) + '"></figure>';
-    }
-    (study.puntos || []).forEach(function (point) {
-      html += '<p>' + richText(point) + '</p>';
-    });
-    html += buildTags(study);
-    if (detailed) html += '<button class="btn" type="button" data-open>Ver detalle completo</button>';
-    if (editing) html += buildAdmin(study, 'colombia');
-    html += '</div>' + buildDetail(study) + '</details>';
-    return html;
-  }
-
   function visibleCategoryIndexes(studies, editing) {
     if (editing) return [0, 1, 2, 3];
     return [0, 1, 2, 3].filter(function (category) {
       return studies.some(function (study) { return study.categoria === category; });
     });
-  }
-
-  function shouldShowColombia(studies, editing) {
-    return Boolean(editing || (studies && studies.length));
   }
 
   function clone(value) {
@@ -208,9 +186,7 @@
     richText: richText,
     hasDetail: hasDetail,
     buildStudy: buildStudy,
-    buildColombiaStudy: buildColombiaStudy,
     visibleCategoryIndexes: visibleCategoryIndexes,
-    shouldShowColombia: shouldShowColombia,
     createStudy: createStudy,
     updateStudy: updateStudy,
     moveStudy: moveStudy,

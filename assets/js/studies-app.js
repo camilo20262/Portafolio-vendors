@@ -7,15 +7,12 @@
 
   var categoryColumns = Array.prototype.slice.call(document.querySelectorAll('#estudios .col[data-category]'));
   var categoryLists = categoryColumns.map(function (column) { return column.querySelector('.list'); });
-  var colombiaColumn = document.getElementById('colombia');
-  var colombiaList = colombiaColumn.querySelector('.list');
   var detail = document.getElementById('detail');
   var loginDialog = document.getElementById('login-dialog');
   var studyDialog = document.getElementById('study-dialog');
   var editorBar = document.getElementById('editor-bar');
   var statusEl = document.getElementById('editor-status');
   var state = [];
-  var colombiaState = [];
   var vendorsState = [];
   var dirtyScopes = new Set();
   var loadedScopes = new Set();
@@ -26,7 +23,7 @@
   var publishing = false;
   var activeDetail = 0;
   var lastFocus = null;
-  var pendingImages = { studies: Object.create(null), colombia: Object.create(null), vendors: Object.create(null) };
+  var pendingImages = { studies: Object.create(null), vendors: Object.create(null) };
   var formImage = null;
   var formScope = 'studies';
   var imageProcessing = false;
@@ -65,7 +62,7 @@
   }
 
   function collectionFor(scope) {
-    return scope === 'vendors' ? vendorsState : scope === 'colombia' ? colombiaState : state;
+    return scope === 'vendors' ? vendorsState : state;
   }
 
   function setDirty(value, scope) {
@@ -99,12 +96,6 @@
       if (editing && loadedScopes.has('studies')) list.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="' + category + '" data-scope="studies">+ Agregar estudio</button>');
       categoryColumns[category].hidden = visibleCategories.indexOf(category) === -1;
     });
-    colombiaList.innerHTML = colombiaState.map(function (study, index) {
-      return core.buildColombiaStudy(study, index, editing);
-    }).join('');
-    if (editing && loadedScopes.has('colombia')) colombiaList.insertAdjacentHTML('beforeend', '<button class="add-study" type="button" data-add="" data-scope="colombia">+ Agregar estudio</button>');
-    var showColombia = core.shouldShowColombia(colombiaState, editing);
-    colombiaColumn.hidden = !showColombia;
     var count = document.querySelector('#inicio .cover-stats > div:last-child b');
     if (count) count.textContent = String(state.length);
     var vendorsList = document.getElementById('vendors-list');
@@ -116,10 +107,6 @@
     if (!loadedScopes.has('studies')) {
       categoryColumns[0].hidden = false;
       categoryLists[0].innerHTML = '<p>No fue posible cargar los estudios. Recarga la página para intentar de nuevo.</p>';
-    }
-    if (!loadedScopes.has('colombia')) {
-      colombiaColumn.hidden = false;
-      colombiaList.innerHTML = '<p>No fue posible cargar los estudios de Colombia. Recarga la página para intentar de nuevo.</p>';
     }
     applyImageOrientations();
   }
@@ -167,13 +154,13 @@
     }
     detail.querySelector('.d-body').scrollTop = 0;
     detail.querySelector('.d-wrap').scrollTop = 0;
-    detail.dataset.returnHash = study.closest('#colombia') ? '#colombia' : '#estudios';
+    detail.dataset.returnHash = '#estudios';
     setHash('#' + study.id);
   }
 
   function openHashStudy() {
     var hash = location.hash.slice(1);
-    var target = document.getElementById(hash) || document.getElementById('estudio-' + hash) || document.getElementById('colombia-estudio-' + hash);
+    var target = document.getElementById(hash) || document.getElementById('estudio-' + hash);
     if (!target || target.getAttribute('data-has-detail') !== 'true') return;
     var studies = studiesInDom();
     var index = studies.indexOf(target);
@@ -265,7 +252,7 @@
       id: '', nombre: '', frase: '', puntos: [], tiempos: [], etiquetas: [],
       imagen: null, intro: '', secciones: [], cronograma: [], datos: []
     };
-    if (scope !== 'colombia') study.categoria = category;
+    study.categoria = category;
     return study;
   }
 
@@ -275,7 +262,7 @@
     studyDialog.dataset.scope = formScope;
     if (formImage) URL.revokeObjectURL(formImage.url);
     var isVendor = formScope === 'vendors';
-    document.getElementById('study-form-title').textContent = (isNew ? 'Agregar estudio' : 'Editar estudio') + (formScope === 'colombia' ? ' de Colombia' : '');
+    document.getElementById('study-form-title').textContent = isNew ? 'Agregar estudio' : 'Editar estudio';
     if (isVendor) document.getElementById('study-form-title').textContent = isNew ? 'Agregar vendor' : 'Editar vendor';
     document.getElementById('study-form-help').hidden = isVendor;
     document.getElementById('study-tagline-label').textContent = isVendor ? 'Descripción corta' : 'Frase';
@@ -403,7 +390,7 @@
       cronograma: readPairs('.timeline-row', 'duracion', 'actividad'),
       datos: readPairs('.fact-row', 'nombre', 'valor')
     };
-    if (formScope !== 'colombia') study.categoria = Number(document.getElementById('study-category').value);
+    study.categoria = Number(document.getElementById('study-category').value);
     return study;
   }
 
@@ -464,9 +451,8 @@
       scopes.forEach(function (scope) {
         Object.keys(pendingImages[scope]).forEach(function (id) { URL.revokeObjectURL(pendingImages[scope][id].url); });
       });
-      pendingImages = { studies: Object.create(null), colombia: Object.create(null), vendors: Object.create(null) };
+      pendingImages = { studies: Object.create(null), vendors: Object.create(null) };
       if (payload.studies) state = payload.studies;
-      if (payload.colombia) colombiaState = payload.colombia;
       if (payload.vendors) vendorsState = payload.vendors;
       baseSha = result.sha;
       setDirty(false);
@@ -511,8 +497,7 @@
     var move = event.target.closest('[data-move]');
     if (move && editing) {
       var moveScope = move.getAttribute('data-scope') || 'studies';
-      if (moveScope === 'colombia') colombiaState = core.moveStudy(colombiaState, move.getAttribute('data-id'), Number(move.getAttribute('data-move')));
-      else state = core.moveStudy(state, move.getAttribute('data-id'), Number(move.getAttribute('data-move')));
+      state = core.moveStudy(state, move.getAttribute('data-id'), Number(move.getAttribute('data-move')));
       setDirty(true, moveScope); render(); return;
     }
     var remove = event.target.closest('[data-delete]');
@@ -521,7 +506,6 @@
       var removeScope = remove.getAttribute('data-scope') || 'studies';
       if (window.confirm('¿Eliminar este ' + (removeScope === 'vendors' ? 'vendor' : 'estudio') + '? El cambio no se publicará hasta guardar.')) {
         if (removeScope === 'vendors') vendorsState = core.deleteStudy(vendorsState, removeId);
-        else if (removeScope === 'colombia') colombiaState = core.deleteStudy(colombiaState, removeId);
         else state = core.deleteStudy(state, removeId);
         if (pendingImages[removeScope][removeId]) {
           URL.revokeObjectURL(pendingImages[removeScope][removeId].url);
@@ -632,7 +616,6 @@
       var currentState = collectionFor(formScope);
       currentState = originalId ? core.updateStudy(currentState, originalId, study) : core.createStudy(currentState, study);
       if (formScope === 'vendors') vendorsState = currentState;
-      else if (formScope === 'colombia') colombiaState = currentState;
       else state = currentState;
       if (originalId && originalId !== study.id && pendingImages[formScope][originalId]) {
         pendingImages[formScope][study.id] = pendingImages[formScope][originalId];
@@ -672,12 +655,11 @@
   // Load independently: an unavailable collection cannot be saved as an empty one.
   document.getElementById('edit-entry').disabled = true;
   document.getElementById('vendors-edit-entry').disabled = true;
-  var sources = { studies: '/data/estudios.json', colombia: '/data/colombia.json', vendors: '/data/vendors.json' };
+  var sources = { studies: '/data/estudios.json', vendors: '/data/vendors.json' };
   Promise.all(Object.keys(sources).map(function (scope) {
     return request(sources[scope], { cache: 'no-store' }).then(function (items) {
       if (!Array.isArray(items)) throw new Error('Colección inválida.');
       if (scope === 'vendors') vendorsState = vendorsCore.validateVendors(items);
-      else if (scope === 'colombia') colombiaState = items;
       else state = items;
       loadedScopes.add(scope);
     }).catch(function () { /* render() shows an error for this collection only. */ });

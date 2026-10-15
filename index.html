@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Propuesta BBVA · WPP Media</title>
+<title>Portafolio Comercial BI · WPP Media</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -43,8 +43,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .brand{display:flex;align-items:center;gap:20px;color:inherit;text-decoration:none;margin-right:auto;flex-shrink:0}
 .brand svg{height:30px;width:auto;flex-shrink:0;overflow:hidden}
 .brand-label{border-left:1px solid color-mix(in srgb,currentColor 35%,transparent);padding:6px 0 6px 20px;white-space:nowrap;font-family:var(--head);font-size:17px;font-weight:700;line-height:1}
-.client-brand{display:grid;place-items:center;height:30px;padding:5px 9px;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,80,.12);flex-shrink:0}
-.client-brand img{width:auto;height:18px}
 .nav nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
 .nav nav::-webkit-scrollbar{display:none}
 .nav nav a{color:inherit;text-decoration:none;font-size:15px;font-weight:500;padding:10px 16px;border-radius:999px;white-space:nowrap;transition:background .2s}
@@ -148,7 +146,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .colhead{position:relative;padding:24px 20px 20px;color:#000050;background-color:#93DFE3;background-image:linear-gradient(to top right,#93DFE3 0%,#83BFF7 50%,#5465FF 100%);min-height:156px;display:flex;flex-direction:column;justify-content:flex-end}
 .colhead h3{font-size:21px;font-weight:800}
 .colhead p{font-size:14px;margin-top:6px;font-weight:500;color:#1D2563}
-.colombia-logo{position:absolute;top:16px;right:16px;height:28px;max-width:82px;padding:5px 9px;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,80,.12);object-fit:contain}
 .list{padding:14px;display:flex;flex-direction:column;gap:10px}
 details.study{border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-left:4px solid var(--c);transition:background .2s}
 details.study:hover{background:rgba(255,255,255,.13)}
@@ -260,8 +257,6 @@ html:has(dialog[open]){overflow:hidden}
   .nav .wrap{gap:10px;min-height:64px}
   .brand{gap:10px}
   .brand svg{height:21px}
-  .client-brand{height:26px;padding:4px 7px}
-  .client-brand img{height:15px}
   .cover{margin-top:-65px;padding-top:65px}
   .nav nav{gap:2px}
   .nav nav a{padding:8px 10px;font-size:13px}
@@ -344,10 +339,9 @@ body.is-editing .studies{padding-bottom:150px}
 
 <header class="nav is-solid">
   <div class="wrap">
-    <a class="brand" href="#inicio" aria-label="WPP Media Business Intelligence y BBVA, ir al inicio">
+    <a class="brand" href="#inicio" aria-label="WPP Media Business Intelligence, ir al inicio">
       <svg viewBox="18.5 18.5 192.64 30.06" aria-hidden="true"><use href="#wppm" x="0" y="0" width="229.641" height="67.2626"></use></svg>
       <span class="brand-label">Business Intelligence</span>
-      <span class="client-brand"><img src="/assets/colombia/bbva-logo.png" alt="BBVA"></span>
     </a>
     <nav aria-label="Secciones">
       <a class="opt" href="#quienes">Quiénes somos</a>
@@ -482,7 +476,7 @@ body.is-editing .studies{padding-bottom:150px}
       <div>
         <p class="kicker">Nuestros estudios</p>
         <h2>Estudios de mercado</h2>
-        <p>Estos son los estudios que proponemos para BBVA y los que hemos hecho para el mercado colombiano. Abre un estudio para ver su resumen o entra al detalle completo.</p>
+        <p>Explora nuestros estudios de mercado. Abre un estudio para ver su resumen o entra al detalle completo.</p>
       </div>
       <button class="edit-entry" id="edit-entry" type="button" aria-label="Ingresar al editor">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
@@ -524,15 +518,6 @@ body.is-editing .studies{padding-bottom:150px}
         </div>
       </div>
 
-      <!-- 5. MERCADO DE COLOMBIA -->
-      <div class="col" id="colombia" style="--c:#00DBEE" hidden>
-        <div class="colhead">
-          <img class="colombia-logo" src="/assets/colombia/bbva-logo.png" alt="BBVA">
-          <h3>Mercado de Colombia</h3>
-          <p>Estudios hechos para el mercado colombiano</p>
-        </div>
-        <div class="list"></div>
-      </div>
 
     </div>
   </div>
