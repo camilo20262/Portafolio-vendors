@@ -191,49 +191,11 @@
     "datos": []
   },
   {
-    "id": "category-trend-decoder",
+    "id": "tendencias-medios",
     "categoria": 1,
-    "nombre": "Category Trend Decoder",
-    "frase": "Detecta tendencias reales entre las señales de mercado y descifra el porqué detrás del cambio.",
-    "puntos": [
-      "Qué es: análisis mensual que devela las tendencias más influyentes y las oportunidades ocultas de tu categoría.",
-      "Metodología: “Trend Scout and Hacker”: identifica el “qué” y descifra el “por qué” de los cambios en el consumidor."
-    ],
-    "tiempos": [],
-    "etiquetas": [
-      "Frecuencia mensual"
-    ],
-    "imagen": {
-      "ruta": "/assets/estudios/category-trend-decoder.webp",
-      "alt": "Mesa de trabajo con productos y moodboard de tendencias",
-      "ajuste": "cover"
-    },
-    "intro": "",
-    "secciones": [
-      {
-        "titulo": "",
-        "parrafo": "",
-        "lista": [
-          "Metodología “Trend Scout and Hacker” para detectar tendencias reales a partir de señales de mercado.",
-          "Del qué al por qué: no solo identifica qué tendencias existen, también descifra el porqué detrás de los cambios en preferencias y expectativas del consumidor.",
-          "Enfoque en ROI y crecimiento sostenible: un mejor retorno de inversión en cada lanzamiento.",
-          "Eficiencia desde el inicio: optimiza la estrategia de producto, marketing y comunicación desde la etapa inicial."
-        ],
-        "tipoLista": "ticks"
-      }
-    ],
-    "cronograma": [],
-    "datos": []
-  },
-  {
-    "id": "tendencias-mercado",
-    "categoria": 1,
-    "nombre": "Tendencias de Mercado",
-    "frase": "Conoce las tendencias actuales y futuras de tu industria y conviértelas en decisiones estratégicas.",
-    "puntos": [
-      "Qué es: análisis de fuentes secundarias para obtener un panorama completo del mercado y anticipar cambios.",
-      "Fuentes: informes macroeconómicos, de la industria, entorno competitivo y preferencias del consumidor."
-    ],
+    "nombre": "Tendencias de Medios",
+    "frase": "Del contexto global al consumidor: un análisis 360° que conecta economía, audiencias y medios para anticipar las tendencias que vienen",
+    "puntos": [],
     "tiempos": [],
     "etiquetas": [],
     "imagen": {
@@ -244,15 +206,43 @@
     "intro": "Anticipa los cambios de tu industria y conviértelos en decisiones estratégicas. Analizamos diferentes fuentes secundarias para obtener un panorama general y completo del mercado:",
     "secciones": [
       {
+        "titulo": "¿Que busca este estudio?",
+        "parrafo": "",
+        "lista": [
+          "Fundamentación estratégica y toma de decisiones inteligente: datos y análisis, que optimiza la planificación de contenidos, la asignación de recursos y el enfoque comercial.",
+          "Conocimiento profundo del consumidor y del mercado: quién es nuestra audiencia, qué busca, y dónde se mueve el mercado.",
+          "Potencializar la relevancia y la competitividad: Entender las tendencias es innovar más rápido, liderar con más fuerza y atraer más audiencias y anunciantes."
+        ],
+        "tipoLista": "steps"
+      }
+    ],
+    "cronograma": [],
+    "datos": []
+  },
+  {
+    "id": "reporte-de-medios",
+    "categoria": 1,
+    "nombre": "Reporte de Medios",
+    "frase": "Una radiografía por medio que convierte datos en ventas: contenidos hiper-relevantes, argumentos comerciales a la medida y nuevas vías de monetización antes que la competencia.",
+    "puntos": [],
+    "tiempos": [],
+    "etiquetas": [],
+    "imagen": {
+      "ruta": "/assets/estudios/reporte-de-medios-20158bf861e8.webp",
+      "alt": "Reporte de medios",
+      "ajuste": "fit"
+    },
+    "intro": "",
+    "secciones": [
+      {
         "titulo": "",
         "parrafo": "",
         "lista": [
-          "Informes macroeconómicos",
-          "Informes de la industria",
-          "Entorno competitivo",
-          "Preferencias de los consumidores"
+          "Diseño de contenidos hiper-relevantes : Formatos y mensajes a la medida de cada plataforma, que maximizan el engagement con la audiencia.",
+          "Argumentos de venta ultra-específicos: Paquetes publicitarios más segmentados que venden engagement, no solo alcance.",
+          "Nuevas oportunidades de monetización: Ser los primeros en ofrecer las tendencias emergentes, abriendo nuevas vías de ingreso."
         ],
-        "tipoLista": "ticks"
+        "tipoLista": "steps"
       }
     ],
     "cronograma": [],
