@@ -626,19 +626,18 @@
     "datos": []
   },
   {
-    "id": "touchpoints",
+    "id": "cis",
     "categoria": 2,
-    "nombre": "Touchpoints",
-    "frase": "No es cuánto inviertes, es dónde inviertes. Cada punto de contacto pesa distinto en la mente del consumidor.",
+    "nombre": "CIS",
+    "frase": "Impulsamos tu monetización y fortalecemos tu conexión con la audiencia",
     "puntos": [
-      "Objetivo: identificar y priorizar puntos de contacto según su influencia en la decisión de compra y en los drivers de marca o categoría.",
-      "Metodología: encuestas cuantitativas face to face sobre la experiencia del consumidor y su actitud hacia la categoría."
+      "En un mercado saturado, conocer a la audiencia ya no es opcional: es la clave para optimizar contenidos y ofertas comerciales"
     ],
     "tiempos": [
       "Campo 3 semanas"
     ],
     "etiquetas": [
-      "Informe 5 días háb."
+      "Informe 10 días háb."
     ],
     "imagen": {
       "ruta": "/assets/estudios/touchpoints.webp",
@@ -648,38 +647,18 @@
     "intro": "",
     "secciones": [
       {
-        "titulo": "Objetivo",
-        "parrafo": "Identificar y priorizar puntos de contacto según su nivel de influencia en la decisión de compra en la categoría y su relevancia para construir drivers de marca o categoría.",
-        "lista": [],
-        "tipoLista": "ticks"
-      },
-      {
-        "titulo": "Metodología",
-        "parrafo": "Encuestas cuantitativas que permiten priorizar medios y puntos de contacto con base en las experiencias del consumidor y su actitud hacia la categoría.",
-        "lista": [],
-        "tipoLista": "ticks"
-      },
-      {
-        "titulo": "Cronograma",
+        "titulo": "CIS Audience Media Insights",
         "parrafo": "",
-        "lista": [],
-        "tipoLista": "ticks"
+        "lista": [
+          "Decisiones basadas en evidencia: Editoriales y de programación, sustentadas en datos reales de audiencia.",
+          "Contenido de mayor impacto: Mayor resonancia y conexión genuina con el público objetivo.",
+          "Ofertas comerciales irrefutables: Propuestas de valor sólidas para anunciantes y agencias.",
+          "Liderazgo sostenido: Relevancia continua en un mercado altamente competitivo."
+        ],
+        "tipoLista": "steps"
       }
     ],
-    "cronograma": [
-      {
-        "duracion": "2 días háb.",
-        "actividad": "Elaboración y coordinación del cuestionario"
-      },
-      {
-        "duracion": "3 semanas",
-        "actividad": "Campo face to face, tabulación y tablas"
-      },
-      {
-        "duracion": "5 días háb.",
-        "actividad": "Elaboración del informe, según la extensión del cuestionario"
-      }
-    ],
+    "cronograma": [],
     "datos": []
   },
   {
