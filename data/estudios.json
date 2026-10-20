@@ -116,6 +116,36 @@
     "datos": []
   },
   {
+    "id": "content-navigator",
+    "categoria": 0,
+    "nombre": "Content Navigator",
+    "frase": "Plataforma de analítica estratégica para medios (radio, prensa, digital) que ejecutan contenido patrocinado. Transforma remotos, publirreportajes y branded content en inteligencia comercial accionable.",
+    "puntos": [],
+    "tiempos": [],
+    "etiquetas": [],
+    "imagen": {
+      "ruta": "/assets/estudios/content-navigator-8297fb879cab.webp",
+      "alt": "ROI",
+      "ajuste": "fit"
+    },
+    "intro": "",
+    "secciones": [
+      {
+        "titulo": "¿Cómo funciona?",
+        "parrafo": "",
+        "lista": [
+          "Se ejecuta la pieza de contenido patrocinado (radio, prensa o digital).",
+          "Se mide el rendimiento real y el engagement generado.",
+          "Se convierte la data en insights comerciales claros.",
+          "Se justifica el ROI y se optimiza la venta futura."
+        ],
+        "tipoLista": "ticks"
+      }
+    ],
+    "cronograma": [],
+    "datos": []
+  },
+  {
     "id": "territoryscan",
     "categoria": 1,
     "nombre": "TerritoryScan",
