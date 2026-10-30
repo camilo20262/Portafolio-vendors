@@ -69,12 +69,7 @@
         "actividad": "Entrega del informe final"
       }
     ],
-    "datos": [
-      {
-        "nombre": "Tiempo de entrega",
-        "valor": "45 días"
-      }
-    ]
+    "datos": []
   },
   {
     "id": "bav",
