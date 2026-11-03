@@ -10,7 +10,11 @@
     ],
     "tiempos": [],
     "etiquetas": [],
-    "imagen": null,
+    "imagen": {
+      "ruta": "/assets/estudios/lift-3482f5b32d09.webp",
+      "alt": "BI",
+      "ajuste": "fit"
+    },
     "intro": "",
     "secciones": [
       {
@@ -111,7 +115,7 @@
     "tiempos": [],
     "etiquetas": [],
     "imagen": {
-      "ruta": "/assets/estudios/content-navigator-8297fb879cab.webp",
+      "ruta": "/assets/estudios/content-navigator-3f36bb9c5331.webp",
       "alt": ".",
       "ajuste": "fit"
     },
@@ -322,7 +326,7 @@
       "Informe 10 días háb."
     ],
     "imagen": {
-      "ruta": "/assets/estudios/cis-e92fcb719b8a.webp",
+      "ruta": "/assets/estudios/cis-68a79341d171.webp",
       "alt": "Ejemplo de gráfico de priorización de puntos de contacto",
       "ajuste": "fit"
     },
@@ -426,7 +430,11 @@
     ],
     "tiempos": [],
     "etiquetas": [],
-    "imagen": null,
+    "imagen": {
+      "ruta": "/assets/estudios/influencer-scope-3633420b37b3.webp",
+      "alt": ".",
+      "ajuste": "fit"
+    },
     "intro": "",
     "secciones": [
       {
@@ -459,7 +467,11 @@
       "Múltiples fuentes",
       "Hallazgos accionables"
     ],
-    "imagen": null,
+    "imagen": {
+      "ruta": "/assets/estudios/dashboard-oc-e24e4047e9de.webp",
+      "alt": ".",
+      "ajuste": "fit"
+    },
     "intro": "Un dashboard personalizado que junta toda tu información en un solo lugar, para que puedas verla de un vistazo y tomar mejores decisiones.",
     "secciones": [
       {
